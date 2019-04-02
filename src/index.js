@@ -1,11 +1,14 @@
+/* vim: set ts=4 sw=4 noet: */
 import loaderUtils from 'loader-utils';
 import glob from 'glob';
 
+const quotedString = /(['"])(.*?)\1/;
+const trailingSlash = /\/$/;
+
 export default function importGlob(source) {
+	this.cacheable();
 	const options = loaderUtils.parseQuery(this.query);
-	// Default nodir to true
-	options.nodir = typeof options.nodir !== 'undefined' ? options.nodir : true;
-	options.cwd = this.context;
+	options.sync = true;
 
 	let { test = "import", delimiter = '\n' } = options;
 	const qualifier = new RegExp(`^.*\\b${test}\\b(.*)$`, 'gm');
@@ -24,16 +27,30 @@ export default function importGlob(source) {
 		let names = pre.slice(pre.indexOf("{") + 1,pre.indexOf("}"));
 		names = names.split(',');
 
+		options.cwd = this.context;
+		const dirGlob = new glob.Glob(
+			trailingSlash.test(content) ?  content : `${content}/`, options);
+
+		dirGlob.found
+		.forEach(directory => this.addContextDependency(directory));
+
+		const fileOptions = Object.create(options);
+		if (!options.hasOwnProperty('nodir')) {
+			fileOptions.nodir = true;
+		}
+		fileOptions.cwd = this.context;
+		fileOptions.cache = dirGlob.cache;
+		fileOptions.statCache = dirGlob.statCache;
+
 		return glob.sync(content, options)
-		.map((filename, index) => `import ${names[index]} from ${quote}${filename}${quote}${post}`)
-		.join(delimiter);
+			.map((filename, index) => `import ${names[index]} from ${quote}${filename}${quote}${post}`)
+			.join(delimiter);
 	}
 
-	const quotedString = /(['"])(.*?)\1/;
 	function expandLine(line, payload) {
 		if (!(payload && payload.trim())) return line;
-		return expandGlob(quotedString.exec(line)) || line;
+		return expandGlob.call(this, quotedString.exec(line)) || line;
 	}
 
-	return source.replace(qualifier, expandLine);
+	return source.replace(qualifier, expandLine.bind(this));
 }

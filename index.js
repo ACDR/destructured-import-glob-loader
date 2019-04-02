@@ -1,3 +1,4 @@
+/* vim: set ts=4 sw=4 noet: */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -18,11 +19,13 @@ var _glob = require('glob');
 
 var _glob2 = _interopRequireDefault(_glob);
 
+var quotedString = /(['"])(.*?)\1/;
+var trailingSlash = /\/$/;
+
 function importGlob(source) {
+	this.cacheable();
 	var options = _loaderUtils2['default'].parseQuery(this.query);
-	// Default nodir to true
-	options.nodir = typeof options.nodir !== 'undefined' ? options.nodir : true;
-	options.cwd = this.context;
+	options.sync = true;
 
 	var _options$test = options.test;
 	var test = _options$test === undefined ? "import" : _options$test;
@@ -32,6 +35,8 @@ function importGlob(source) {
 	var qualifier = new RegExp('^.*\\b' + test + '\\b(.*)$', 'gm');
 
 	function expandGlob(result) {
+		var _this = this;
+
 		if (!result) return;
 
 		var _result = _slicedToArray(result, 3);
@@ -51,18 +56,32 @@ function importGlob(source) {
 		var names = pre.slice(pre.indexOf("{") + 1, pre.indexOf("}"));
 		names = names.split(',');
 
+		options.cwd = this.context;
+		var dirGlob = new _glob2['default'].Glob(trailingSlash.test(content) ? content : content + '/', options);
+
+		dirGlob.found.forEach(function (directory) {
+			return _this.addContextDependency(directory);
+		});
+
+		var fileOptions = Object.create(options);
+		if (!options.hasOwnProperty('nodir')) {
+			fileOptions.nodir = true;
+		}
+		fileOptions.cwd = this.context;
+		fileOptions.cache = dirGlob.cache;
+		fileOptions.statCache = dirGlob.statCache;
+
 		return _glob2['default'].sync(content, options).map(function (filename, index) {
 			return 'import ' + names[index] + ' from ' + quote + filename + quote + post;
 		}).join(delimiter);
 	}
 
-	var quotedString = /(['"])(.*?)\1/;
 	function expandLine(line, payload) {
 		if (!(payload && payload.trim())) return line;
-		return expandGlob(quotedString.exec(line)) || line;
+		return expandGlob.call(this, quotedString.exec(line)) || line;
 	}
 
-	return source.replace(qualifier, expandLine);
+	return source.replace(qualifier, expandLine.bind(this));
 }
 
 module.exports = exports['default'];
