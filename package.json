@@ -1,7 +1,7 @@
 {
-  "name": "import-glob-loader",
-  "version": "1.0.0",
-  "description": "Globbing preloader for Webpack",
+  "name": "destructured-import-glob-loader",
+  "version": "0.0.1",
+  "description": "Destructured JS globbing loader for Webpack",
   "main": "index.js",
   "scripts": {
     "prepublish": "babel src/index.js -o index.js",
@@ -12,8 +12,8 @@
     "loader",
     "glob"
   ],
-  "author": "Alex Lee <aintaer@aintaer.com>",
-  "license": "ISC",
+  "author": "Aaron Rose <github@acdr.dev>",
+  "license": "UNLICENSED",
   "dependencies": {
     "glob": "^5.0.13",
     "loader-utils": "^0.2.10"
@@ -23,10 +23,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Aintaer/import-glob-loader.git"
+    "url": "git+https://github.com/ACDR/destructured-import-glob-loader.git"
   },
   "bugs": {
-    "url": "https://github.com/Aintaer/import-glob-loader/issues"
+    "url": "https://github.com/ACDR/destructured-import-glob-loader/issues"
   },
-  "homepage": "https://github.com/Aintaer/import-glob-loader#readme"
+  "homepage": "https://github.com/ACDR/destructured-import-glob-loader#readme"
 }

@@ -21,8 +21,11 @@ export default function importGlob(source) {
 		let pre = line.slice(0, offset),
 			post = line.slice(offset + match.length);
 
+		let names = pre.slice(pre.indexOf("{") + 1,pre.indexOf("}"));
+		names = names.split(',');
+
 		return glob.sync(content, options)
-		.map(filename => `${pre}${quote}${filename}${quote}${post}`)
+		.map((filename, index) => `import ${names[index]} from ${quote}${filename}${quote}${post}`)
 		.join(delimiter);
 	}
 
