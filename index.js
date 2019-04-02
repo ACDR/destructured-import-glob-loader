@@ -1,35 +1,68 @@
-import loaderUtils from 'loader-utils';
-import glob from 'glob';
-export default function importGlob(source) {
-  const options = loaderUtils.parseQuery(this.query); // Default nodir to true
+'use strict';
 
-  options.nodir = typeof options.nodir !== 'undefined' ? options.nodir : true;
-  options.cwd = this.context;
-  let {
-    test = "import",
-    delimiter = '\n'
-  } = options;
-  const qualifier = new RegExp(`^.*\\b${test}\\b(.*)$`, 'gm');
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
 
-  function expandGlob(result) {
-    if (!result) return;
-    const [match, quote, content] = result;
-    const offset = result.index;
-    const line = result.input;
-    if (!glob.hasMagic(content)) return;
-    let pre = line.slice(0, offset),
-        post = line.slice(offset + match.length);
-    let names = pre.slice(pre.indexOf("{") + 1, pre.indexOf("}"));
-    names = names.split(',');
-    return glob.sync(content, options).map((filename, index) => `import ${names[index]} from ${quote}${filename}${quote}${post}`).join(delimiter);
-  }
+var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
 
-  const quotedString = /(['"])(.*?)\1/;
+exports['default'] = importGlob;
 
-  function expandLine(line, payload) {
-    if (!(payload && payload.trim())) return line;
-    return expandGlob(quotedString.exec(line)) || line;
-  }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-  return source.replace(qualifier, expandLine);
+var _loaderUtils = require('loader-utils');
+
+var _loaderUtils2 = _interopRequireDefault(_loaderUtils);
+
+var _glob = require('glob');
+
+var _glob2 = _interopRequireDefault(_glob);
+
+function importGlob(source) {
+	var options = _loaderUtils2['default'].parseQuery(this.query);
+	// Default nodir to true
+	options.nodir = typeof options.nodir !== 'undefined' ? options.nodir : true;
+	options.cwd = this.context;
+
+	var _options$test = options.test;
+	var test = _options$test === undefined ? "import" : _options$test;
+	var _options$delimiter = options.delimiter;
+	var delimiter = _options$delimiter === undefined ? '\n' : _options$delimiter;
+
+	var qualifier = new RegExp('^.*\\b' + test + '\\b(.*)$', 'gm');
+
+	function expandGlob(result) {
+		if (!result) return;
+
+		var _result = _slicedToArray(result, 3);
+
+		var match = _result[0];
+		var quote = _result[1];
+		var content = _result[2];
+
+		var offset = result.index;
+		var line = result.input;
+
+		if (!_glob2['default'].hasMagic(content)) return;
+
+		var pre = line.slice(0, offset),
+		    post = line.slice(offset + match.length);
+
+		var names = pre.slice(pre.indexOf("{") + 1, pre.indexOf("}"));
+		names = names.split(',');
+
+		return _glob2['default'].sync(content, options).map(function (filename, index) {
+			return 'import ' + names[index] + ' from ' + quote + filename + quote + post;
+		}).join(delimiter);
+	}
+
+	var quotedString = /(['"])(.*?)\1/;
+	function expandLine(line, payload) {
+		if (!(payload && payload.trim())) return line;
+		return expandGlob(quotedString.exec(line)) || line;
+	}
+
+	return source.replace(qualifier, expandLine);
 }
+
+module.exports = exports['default'];
