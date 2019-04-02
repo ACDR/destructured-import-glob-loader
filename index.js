@@ -32,7 +32,7 @@ function importGlob(source) {
 	var _options$delimiter = options.delimiter;
 	var delimiter = _options$delimiter === undefined ? '\n' : _options$delimiter;
 
-	var qualifier = new RegExp('^.*\\b' + test + '\\b(.*)$', 'gm');
+	var qualifier = /import {[^;]+}.*?(\'.*?\*')/gm;
 
 	function expandGlob(result) {
 		var _this = this;
@@ -50,10 +50,10 @@ function importGlob(source) {
 
 		if (!_glob2['default'].hasMagic(content)) return;
 
-		var pre = line.slice(0, offset),
-		    post = line.slice(offset + match.length);
+		var pre = line.slice(0, offset);
 
 		var names = pre.slice(pre.indexOf("{") + 1, pre.indexOf("}"));
+		names = names.replace(/\s/g, '');
 		names = names.split(',');
 
 		options.cwd = this.context;
@@ -72,7 +72,11 @@ function importGlob(source) {
 		fileOptions.statCache = dirGlob.statCache;
 
 		return _glob2['default'].sync(content, options).map(function (filename, index) {
-			return 'import ' + names[index] + ' from ' + quote + filename + quote + post;
+			if (names[index].indexOf('//') > -1) {
+				return '';
+			}
+
+			return 'import ' + names[index] + ' from ' + quote + filename + quote + ';';
 		}).join(delimiter);
 	}
 

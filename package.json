@@ -1,6 +1,6 @@
 {
   "name": "destructured-import-glob-loader",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Destructured JS globbing loader for Webpack",
   "main": "index.js",
   "scripts": {

@@ -11,7 +11,7 @@ export default function importGlob(source) {
 	options.sync = true;
 
 	let { test = "import", delimiter = '\n' } = options;
-	const qualifier = new RegExp(`^.*\\b${test}\\b(.*)$`, 'gm');
+	const qualifier = /import {[^;]+}.*?(\'.*?\*')/gm;
 
 	function expandGlob(result) {
 		if (!result) return;
@@ -21,10 +21,10 @@ export default function importGlob(source) {
 
 		if (!glob.hasMagic(content)) return;
 
-		let pre = line.slice(0, offset),
-			post = line.slice(offset + match.length);
+		let pre = line.slice(0, offset);
 
 		let names = pre.slice(pre.indexOf("{") + 1,pre.indexOf("}"));
+		names = names.replace(/\s/g, '');
 		names = names.split(',');
 
 		options.cwd = this.context;
@@ -43,8 +43,13 @@ export default function importGlob(source) {
 		fileOptions.statCache = dirGlob.statCache;
 
 		return glob.sync(content, options)
-			.map((filename, index) => `import ${names[index]} from ${quote}${filename}${quote}${post}`)
-			.join(delimiter);
+			.map((filename, index) => {
+				if (names[index].indexOf('//') > -1) {
+					return '';
+				}
+
+				return `import ${names[index]} from ${quote}${filename}${quote};`
+			}).join(delimiter);
 	}
 
 	function expandLine(line, payload) {
