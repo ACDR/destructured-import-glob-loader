@@ -73,7 +73,7 @@ function importGlob(source) {
 		fileOptions.statCache = dirGlob.statCache;
 
 		return _glob2['default'].sync(content, options).map(function (filename, index) {
-			if (names[index].indexOf('//') > -1) {
+			if (!names[index] || names[index].indexOf('//') > -1) {
 				return '';
 			}
 
