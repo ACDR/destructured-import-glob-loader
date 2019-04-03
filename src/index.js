@@ -26,6 +26,7 @@ export default function importGlob(source) {
 		let names = pre.slice(pre.indexOf("{") + 1,pre.indexOf("}"));
 		names = names.replace(/\s/g, '');
 		names = names.split(',');
+		names = names.sort();
 
 		options.cwd = this.context;
 		const dirGlob = new glob.Glob(

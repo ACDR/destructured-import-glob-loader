@@ -55,6 +55,7 @@ function importGlob(source) {
 		var names = pre.slice(pre.indexOf("{") + 1, pre.indexOf("}"));
 		names = names.replace(/\s/g, '');
 		names = names.split(',');
+		names = names.sort();
 
 		options.cwd = this.context;
 		var dirGlob = new _glob2['default'].Glob(trailingSlash.test(content) ? content : content + '/', options);
