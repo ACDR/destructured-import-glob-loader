@@ -45,7 +45,7 @@ export default function importGlob(source) {
 
 		return glob.sync(content, options)
 			.map((filename, index) => {
-				if (names[index].indexOf('//') > -1) {
+				if (!names[index] || names[index].indexOf('//') > -1) {
 					return '';
 				}
 
