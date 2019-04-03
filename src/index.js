@@ -11,7 +11,7 @@ export default function importGlob(source) {
 	options.sync = true;
 
 	let { test = "import", delimiter = '\n' } = options;
-	const qualifier = /import {[^;]+}.*?(\'.*?\*')/gm;
+	const qualifier = /import {[^;]+}.*?(\'.*?\*');/gm;
 
 	function expandGlob(result) {
 		if (!result) return;

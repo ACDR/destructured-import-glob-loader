@@ -32,7 +32,7 @@ function importGlob(source) {
 	var _options$delimiter = options.delimiter;
 	var delimiter = _options$delimiter === undefined ? '\n' : _options$delimiter;
 
-	var qualifier = /import {[^;]+}.*?(\'.*?\*')/gm;
+	var qualifier = /import {[^;]+}.*?(\'.*?\*');/gm;
 
 	function expandGlob(result) {
 		var _this = this;
